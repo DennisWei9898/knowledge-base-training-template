@@ -61,7 +61,7 @@ For the plain-language "why" and the tool-selection rationale, read `references/
 - `references/03-qa-and-audit.md` — the QA grading rubric (✅/⚠️/❌) and the four-layer integrity audit.
 - `references/04-monthly-update-sop.md` — the repeatable monthly refresh + CI-style coverage diff.
 
-## Methodology sources
-- Anthropic — *Contextual Retrieval* (prepend per-chunk context/source to cut retrieval failures).
-- Anthropic — *Agent Skills best practices* (progressive disclosure: lean `SKILL.md` router + `references/` loaded on demand, avoid deep nesting).
+## Methodology sources (index)
+- Anthropic — *Contextual Retrieval*: prepend per-chunk context/source to cut retrieval failures (~35% in Anthropic's tests). Basis for the per-section source tags. — https://www.anthropic.com/news/contextual-retrieval
+- Anthropic — *Agent Skills best practices*: progressive disclosure (lean `SKILL.md` router + `references/` loaded on demand, avoid deep nesting). Basis for this template's structure. — https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 - RAG chunking practice: Markdown is the most LLM-native format; heading-aware splitting beats fixed-length; extractive beats abstractive for lower hallucination.

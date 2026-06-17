@@ -45,6 +45,7 @@ Refinement isn't by feel; it maps to documented methods:
 - Our landing: each subsection opens with `> Source: {original-filename} | {date}`. This both improves retrieval hit-rate and lets the Q&A tool surface real provenance (NotebookLM's inline citation only resolves to the *source file* level, so finer provenance must be embedded by us).
 
 ### 2. KB structure → Anthropic *Agent Skills: Progressive Disclosure*
+- Source: Anthropic, *Agent Skills best practices* (platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).
 - Principle: keep the entry file (`SKILL.md`) lean and purely a router (which file to read for which question); push detail into `references/`, loaded on demand; avoid deep nested references.
 - Our landing: `SKILL.md` (routing table + glossary) + `knowledge/{domain}/{topic}.md` (two levels, not deeper).
 

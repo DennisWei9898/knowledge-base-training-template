@@ -1,66 +1,94 @@
 # 知識庫訓練模板 · Knowledge Base Training Template
 
-> 中文說明在前，English below ↓
+> 用最白話的方式，教你把一堆亂七八糟的文件，變成一個「有問必答、還會附出處」的小助理。
+> 中文在前，English below ↓
 
 ---
 
-# 中文說明
+# 中文說明（白話版）
 
-一套**與工具無關、可重複套用的方法**，把散落各處的產品／營運文件、設計稿、教學影片，整理成乾淨、**逐段可溯源、可問答**的知識庫——讓非技術同事用打字就能查到答案，而且每個答案都附上「這是從哪份文件來的」。
+## 這是什麼？用一個比喻
 
-本模板打包成一個 [Claude Skill](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills)（`SKILL.md` + `references/`），但方法本身與你用哪個 AI 助理無關。
+想像你有一間**沒有目錄的圖書館**：書（文件）散在好幾個櫃子、抽屜、甚至錄影帶裡，每次要找一句話都得翻半天，還只能去問館裡最資深的那位老員工。
 
-> 萃取並去敏自一個真實的內部專案：約 300 份散落來源，最終做到 **97% 正確、零捏造、逐句可溯源**的問答知識庫。所有公司、產品、人員相關資料都已移除——這裡放的是**方法**，不是任何人的實際知識庫內容。
+這個模板教你做的事，就是**請一位數位圖書館員**：
 
-## 一個核心觀念
+- 你用打字問他問題，他馬上回答；
+- 而且每個答案都會附上「我是從哪本書、哪一頁看到的」，讓你能翻回去核對。
 
-> **維護「一份」乾淨的結構化 Markdown（單一真實來源 SSOT），同時餵給「兩個」出口：**
-> 1. 一個**零程式碼問答工具**（例如 NotebookLM），給非技術同事用；
-> 2. 一個**可重用的 Claude Skill**，給進階查詢與自動化。
+重點：這個模板**不是那間圖書館本身**，而是**「怎麼訓練這位館員」的教學手冊**。你帶自己的書進來，照著做就好。
+
+> 這套方法是從一個真實的內部專案整理出來的（已經把公司、產品、人名全部拿掉）。那個專案把大約 300 份散亂文件，變成一個 **97% 答對、不亂編、每句都能查出處**的問答系統。
+
+## 一個最重要的觀念：一份正本，餵兩個嘴巴
+
+很多人會犯的錯：替每個工具各做一份資料，結果三份資料各說各話，越維護越亂。
+
+正確做法：
+
+> **只養「一份」乾淨的正本（我們叫它 SSOT，單一真實來源），同時餵給「兩張嘴」：**
+> 1. 一個**不用寫程式的問答工具**（例如 Google 的 NotebookLM）→ 給不懂技術的同事用打字問；
+> 2. 一個**可以重複使用的 Claude Skill** → 給進階查詢和自動化用。
 >
-> 更新只改一處 → 兩邊同步，永不各說各話。
+> 以後要改，**只改正本那一份**，兩張嘴自動同步、不會吵架。
 
-四個不可妥協的原則撐起品質：**逐字搬運（extractive）不改寫摘要**、**每段標來源**、**新版優先的時序去重**、以及**「忠於原文 ≠ 正確」——靠領域專家抽測驗證**。
+## 四條鐵則（品質就靠這四條）
 
-## 建置流程
+1. **照抄，不要自己重寫**：數字、金額、日期、規則一律一字不改地搬過來。為什麼？因為「重新講一遍」聽起來很順，但 AI 很容易講錯、甚至自己編。事實正確 > 文筆漂亮。
+2. **每段都貼標籤說「我從哪來」**：像便利貼一樣，每一段開頭寫上來源檔名和日期。這樣 AI 才查得到、也才能附出處。
+3. **新的蓋過舊的**：同一件事有好幾個版本時，**以最新的為準**，舊的只拿來補新的沒寫到的洞。
+4. **「照著原文 ≠ 一定對」**：原始文件本身可能有寫錯、寫一半、或貼錯地方的內容。照抄會把錯也一起抄進來。所以**一定要找懂這個領域的人抽考**，抓到的錯就變成下次的考題。
 
-| 階段 | 內容 |
+## 怎麼做？七個步驟（像訓練新館員）
+
+| 步驟 | 在做什麼（白話） |
 |---|---|
-| 0 | 盤點與分類（互斥分桶，避免重複處理） |
-| 1 | 文字整併——去重、時序去重、逐字搬運、每段埋來源標籤 |
-| 2 | 影片 → 帶時間戳的圖文步驟 |
-| 3 | 設計稿 → 文字規格（REST API render + 視覺判讀） |
-| 4 | 上線到問答工具（依受眾分本） |
-| 5 | QA 驗收——出題、評分 ✅/⚠️/❌、修正、重測 |
-| 6 | 完整性稽核——三方交叉比對（來源 ↔ 知識庫 ↔ 實測） |
-| ∞ | 每月自動更新；人工只做矛盾裁決與抽樣 |
+| 0 | **清點家當**：把所有文件倒出來分類，挑掉空白頁、草稿、重複的 |
+| 1 | **整併成一本乾淨的書**：去重、用新版、照抄、每段貼來源標籤 |
+| 2 | **把教學影片變成文字**：一格一格看懂，寫成「圖文步驟」 |
+| 3 | **把設計稿變成文字**：把只存在設計工具裡的畫面，讀懂後寫成文字規格 |
+| 4 | **送進問答工具**：依不同對象分成不同「書庫」（例如營運一本、規格一本） |
+| 5 | **考試訂正**：出最常被問的題目去考它，答錯/含糊的就修，再重考 |
+| 6 | **完整性大檢查**：三方對照（原文 ↔ 知識庫 ↔ 實際問它），找出「原文有、它卻漏掉」的洞 |
+| ∞ | **每月自動更新**：機器做苦工，人只負責「兩種說法時拍板」和「抽樣抽查」 |
 
-## 檔案結構
+## 一定要知道的一個大坑
+
+NotebookLM 有個會**默默搞砸答案**的怪毛病：它會把用 ```` ``` ```` 框起來的程式碼區塊（SQL、指令、JSON）**整段丟掉、查不到**。結果就是 AI 答不出表格名稱，甚至自己**腦補假的 SQL**。
+
+解法：含程式碼的檔案，上傳前先用 `scripts/make_nlm_upload.py` 跑一遍（把框框轉成純文字，內容一字不差）。其他坑都列在 `references/05-qa-tool-gotchas.md`。
+
+## 檔案在哪、各做什麼
 
 ```
-SKILL.md                          # 方法論 Skill（路由 + 四大原則）
+SKILL.md                          # 方法論主檔（路由 + 四條鐵則）
 references/
-  01-method-overview.md           # 白話版「為什麼」+ 工具選型理由
-  02-technical-pipeline.md        # 架構 + 濃縮管線
-  03-qa-and-audit.md              # QA 評分量表 + 四層完整性稽核
-  04-monthly-update-sop.md        # 每月更新 SOP + CI 式覆蓋率 diff
+  01-method-overview.md           # 白話「為什麼」+ 為什麼選這個工具
+  02-technical-pipeline.md        # 技術版：架構 + 濃縮流程
+  03-qa-and-audit.md              # 怎麼考試（✅/⚠️/❌）+ 四層完整性檢查
+  04-monthly-update-sop.md        # 每月更新流程 + CI 式覆蓋率比對
   05-qa-tool-gotchas.md           # NotebookLM 會默默搞砸品質的坑
 scripts/
-  make_nlm_upload.py              # 把 code block 轉純文字，讓 NotebookLM 能檢索 SQL/指令
+  make_nlm_upload.py              # 把程式碼框轉純文字，讓 NotebookLM 查得到 SQL/指令
 ```
 
-## 當成 Claude Skill 使用
+## 怎麼當成 Claude Skill 來用
 
 ```bash
 git clone https://github.com/DennisWei9898/knowledge-base-training-template.git
 cp -r knowledge-base-training-template ~/.claude/skills/sourced-kb-builder
 ```
 
-之後在任何 Claude Code session 說「幫我建一個可溯源的知識庫」／「把這些文件整併成可問答的 KB」，Skill 的方法就會引導你完成。你提供自己的來源（放在 `knowledge/` 樹下）；本模板提供方法、QA／稽核關卡，以及上傳工具。
+之後在任何 Claude Code 對話裡說「幫我建一個可溯源的知識庫」或「把這些文件整併成可問答的 KB」，Skill 就會帶著你做。**你出書（放在 `knowledge/` 資料夾），模板出方法。**
 
-## 最重要的一個坑
+## 這套方法參考了哪些 Claude 官方文章（索引）
 
-NotebookLM 會**默默把 ```` ``` ```` 程式碼區塊丟出檢索層**。含 SQL／JSON／指令的檔案，上傳前一定要先過 `scripts/make_nlm_upload.py`，否則助理會答不出那些問題、甚至腦補假 SQL。完整清單見 `references/05-qa-tool-gotchas.md`。
+這套做法不是憑感覺，而是對照 Anthropic（Claude）官方的兩篇方法論：
+
+1. **Contextual Retrieval（脈絡式檢索）** — 在每段前面貼上「來源/脈絡」標籤，官方實測能讓檢索失敗率降低約 35%。這就是上面鐵則 2 的根據。
+   👉 https://www.anthropic.com/news/contextual-retrieval
+2. **Agent Skills best practices（Skill 最佳實踐：漸進式揭露）** — 入口檔保持精簡只做「路由」，細節放 `references/` 按需載入，不要堆太多層。這就是本模板 `SKILL.md` + `references/` 結構的根據。
+   👉 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 
 ---
 
@@ -68,45 +96,50 @@ NotebookLM 會**默默把 ```` ``` ```` 程式碼區塊丟出檢索層**。含 S
 
 A reusable, **tool-agnostic method** for turning scattered product/operations documents, design files, and tutorial videos into a clean, **citation-grounded, queryable knowledge base** — so non-technical teammates can ask questions by typing and every answer cites its source.
 
+Think of it as **a manual for training a digital librarian**: you bring your own books (docs), and the assistant answers questions while always pointing back to the exact source. This template is the *training manual*, not anyone's actual library.
+
 It is packaged as a [Claude Skill](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills) (`SKILL.md` + `references/`), but the method works regardless of which assistant you use.
 
-> Distilled and anonymized from a real internal deployment that took ~300 scattered source files to a **97%-correct, zero-hallucination, fully-traceable** Q&A knowledge base. All company-, product-, and person-specific data has been removed — this is the *method*, not anyone's actual knowledge base.
+> Distilled and anonymized from a real internal deployment that took ~300 scattered source files to a **97%-correct, zero-hallucination, fully-traceable** Q&A knowledge base. All company-, product-, and person-specific data has been removed.
 
-## The one idea
+## The one idea: one source, two mouths
 
-> **Maintain ONE clean set of structured Markdown (the Single Source of Truth), and feed it to TWO outputs:**
+> **Keep ONE clean Single Source of Truth (SSOT) in Markdown, and feed it to TWO outputs:**
 > 1. a **no-code Q&A tool** (e.g. NotebookLM) for non-technical staff, and
 > 2. a **reusable Claude Skill** for advanced queries & automation.
 >
-> Update one place → both stay in sync.
+> Edit one place → both stay in sync, and never contradict each other.
 
-Four non-negotiable principles drive the quality: **extractive (verbatim) not abstractive**, **per-section source tags**, **newest-version-wins conflict resolution**, and **"faithful-to-source ≠ correct" — verify with a domain expert.**
+## Four iron rules (this is where the quality comes from)
 
-## The pipeline
+1. **Copy verbatim, don't rewrite.** Numbers, amounts, dates, rules are moved word-for-word. Paraphrasing reads nicely but makes AI hallucinate. Facts > fluency.
+2. **Tag every section with "where I came from."** Each section opens with its source file + date — this is what makes answers retrievable and citable.
+3. **Newest wins.** When a topic has many versions, the latest is authoritative; older ones only backfill gaps.
+4. **"Faithful to source ≠ correct."** Sources can contain drafts, mis-pastes, and unbuilt "vision" items. Only a domain expert sampling answers catches these — every catch becomes a regression test.
+
+## The pipeline (like training a new librarian)
 
 | Stage | What |
 |---|---|
-| 0 | Inventory & taxonomy (mutually-exclusive topic buckets) |
-| 1 | Consolidate text — dedupe, time-order, extractive move, source-tag |
+| 0 | Inventory & taxonomy (drop empties/drafts/dupes; mutually-exclusive buckets) |
+| 1 | Consolidate text — dedupe, newest-wins, copy verbatim, source-tag each section |
 | 2 | Videos → timestamped illustrated steps |
 | 3 | Design files → text specs (via REST API render + visual reading) |
 | 4 | Publish to the Q&A tool (split by audience) |
 | 5 | QA loop — ask likely questions, grade ✅/⚠️/❌, fix, re-test |
 | 6 | Integrity audit — three-way cross-check (source ↔ KB ↔ live test) |
-| ∞ | Monthly auto-update; human only arbitrates & samples |
+| ∞ | Monthly auto-update; humans only arbitrate conflicts & sample |
+
+## The single biggest gotcha
+
+NotebookLM **silently drops fenced code blocks from retrieval**. Run any file containing SQL/JSON/commands through `scripts/make_nlm_upload.py` before uploading, or the assistant will fail those questions and may hallucinate fake SQL. Full list in `references/05-qa-tool-gotchas.md`.
 
 ## Repository layout
 
 ```
-SKILL.md                          # the method skill (router + principles)
-references/
-  01-method-overview.md           # plain-language "why" + tool-selection rationale
-  02-technical-pipeline.md        # architecture + the condensing pipeline
-  03-qa-and-audit.md              # QA grading rubric + four-layer integrity audit
-  04-monthly-update-sop.md        # repeatable monthly refresh + CI-style coverage diff
-  05-qa-tool-gotchas.md           # NotebookLM quirks that silently wreck quality
-scripts/
-  make_nlm_upload.py              # un-fence code blocks so NotebookLM can index SQL/commands
+SKILL.md                          # the method skill (router + the four rules)
+references/01..05                  # overview, pipeline, QA/audit, monthly SOP, gotchas
+scripts/make_nlm_upload.py         # un-fence code blocks so NotebookLM can index SQL/commands
 ```
 
 ## Use it as a Claude Skill
@@ -116,11 +149,16 @@ git clone https://github.com/DennisWei9898/knowledge-base-training-template.git
 cp -r knowledge-base-training-template ~/.claude/skills/sourced-kb-builder
 ```
 
-Then in any Claude Code session, ask to "build a sourced knowledge base" / "consolidate these docs into a queryable KB" and the Skill's method will guide the build. You supply your own sources under a `knowledge/` tree; this template supplies the method, the QA/audit gates, and the upload tooling.
+Then ask Claude Code to "build a sourced knowledge base." You supply the sources; the template supplies the method, the QA/audit gates, and the upload tooling.
 
-## The single most important gotcha
+## Reference articles this method is built on (index)
 
-NotebookLM **silently drops fenced code blocks from retrieval**. Run any file containing SQL/JSON/commands through `scripts/make_nlm_upload.py` before uploading, or the assistant will fail those questions and may hallucinate fake SQL. Full list of quirks in `references/05-qa-tool-gotchas.md`.
+This isn't guesswork — it maps to two official Anthropic (Claude) methods:
+
+1. **Contextual Retrieval** — prepend per-chunk context/source to cut retrieval failures (~35% in Anthropic's tests). The basis for iron rule #2.
+   👉 https://www.anthropic.com/news/contextual-retrieval
+2. **Agent Skills best practices** — progressive disclosure: a lean router file + `references/` loaded on demand. The basis for this template's structure.
+   👉 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 
 ---
 
