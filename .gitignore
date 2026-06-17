@@ -1,0 +1,4 @@
+.DS_Store
+upload/
+__pycache__/
+*.pyc
